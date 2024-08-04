@@ -1,0 +1,10 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/ConsumerPedidos/bin
+/ConsumerPedidos/obj
+/ConsumerPedidos/Properties/PublishProfiles
+/ConsumerPedidosTest/bin/Debug/net8.0
+/ConsumerPedidosTest/obj
