@@ -1,6 +1,7 @@
-﻿using MongoDB.Driver;
+﻿using ConsumerPedidos.src.RabbitMQWorker.Services;
+using MongoDB.Driver;
 
-public class PedidoService
+public class PedidoService : IPedidoService
 {
     private readonly IMongoCollection<Pedido> _pedidos;
 
@@ -18,6 +19,5 @@ public class PedidoService
     public void InserirPedidoNoMongoDB(Pedido pedido)
     {
         _pedidos.InsertOne(pedido);
-        Console.WriteLine("Pedido inserido no MongoDB com sucesso!");
     }
 }

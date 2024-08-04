@@ -1,20 +1,20 @@
-﻿using System.Text;
+﻿using ConsumerPedidos.src.RabbitMQWorker.Services;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using FluentValidation.Results;
+using System.Text;
 public class Worker : BackgroundService
 {
-    private readonly ILogger<Worker> _logger;
-    private readonly PedidoService _pedidoService;
+
+    private readonly ILeituraMensagem _leituraMensagem;
     private readonly string _filaPedidos = "pedidos";
-    public Worker(ILogger<Worker> logger, PedidoService pedidoService)
+    private readonly ILogger<Worker> _logger;
+
+    public Worker(ILeituraMensagem leituraMensagem, ILogger<Worker> logger)
     {
+        _leituraMensagem = leituraMensagem;
         _logger = logger;
-        _pedidoService = pedidoService;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -41,28 +41,13 @@ public class Worker : BackgroundService
             var consumer = new EventingBasicConsumer(channel);
             consumer.Received += (model, ea) =>
             {
+                var body = ea.Body.ToArray();
+                var message = Encoding.UTF8.GetString(body);
+                _logger.LogInformation(" [x] Received {0}", message);
+
                 try
                 {
-                    var body = ea.Body.ToArray();
-                    var message = Encoding.UTF8.GetString(body);
-                    _logger.LogInformation(" [x] Received {0}", message);
-
-                    // Convertendo o body para BSON e desserializando para um objeto Pedido
-                    var document = BsonDocument.Parse(message);
-                    Pedido pedido = BsonSerializer.Deserialize<Pedido>(document);
-
-                    var pedidoValidator = new PedidoValidator();
-                    ValidationResult result = pedidoValidator.Validate(pedido);
-
-                    if (!result.IsValid)
-                    {
-                        throw new Exception(string.Join(", ", result.Errors.Select(t => t.ErrorMessage)));
-                    }
-
-                    _pedidoService.InserirPedidoNoMongoDB(pedido);
-
-                    _logger.LogInformation(" [x] Finished {0}", message);
-
+                    _leituraMensagem.LerMensagem(message);
                 }
                 catch (Exception ex)
                 {
