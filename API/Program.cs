@@ -10,7 +10,7 @@ var mongoClient = new MongoClient(connectionString);
 var database = mongoClient.GetDatabase("ProjetoBTG");
 
 builder.Services.AddSingleton<IMongoDatabase>(database);
-builder.Services.AddScoped<IRelatorioRepository, RelatorioRepostory>();
+builder.Services.AddScoped<IRelatorioRepository, RelatorioRepository>();
 
 
 var app = builder.Build();

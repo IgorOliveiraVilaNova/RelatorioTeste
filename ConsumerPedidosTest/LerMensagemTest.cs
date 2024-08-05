@@ -1,9 +1,6 @@
 ﻿using ConsumerPedidos.src.RabbitMQWorker.Services;
-using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System;
-using System.Text;
 
 namespace ConsumerPedidosTest
 {
