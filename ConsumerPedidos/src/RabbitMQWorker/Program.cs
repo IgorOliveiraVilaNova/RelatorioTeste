@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using ConsumerPedidos.src.RabbitMQWorker.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 public class Program
@@ -13,6 +14,7 @@ public class Program
             .ConfigureServices((hostContext, services) =>
             {
                 services.AddHostedService<Worker>();
-                services.AddSingleton<PedidoService>();
+                services.AddScoped<IPedidoService, PedidoService>();
+                services.AddScoped<ILeituraMensagem, LeituraMensagem>();
             });
 }

@@ -1,4 +1,7 @@
 using API.Repositories;
+using API.Services;
+using MongoDB.Bson;
+using MongoDB.Bson.IO;
 using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +13,7 @@ var mongoClient = new MongoClient(connectionString);
 var database = mongoClient.GetDatabase("ProjetoBTG");
 
 builder.Services.AddSingleton<IMongoDatabase>(database);
+builder.Services.AddScoped<IMongoService, MongoService>();
 builder.Services.AddScoped<IRelatorioRepository, RelatorioRepository>();
 
 
@@ -17,7 +21,7 @@ var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");
 
-app.MapGet("/pedido/soma/{codigoPedido}", async (int codigoPedido, IRelatorioRepository relatorioRepository) =>
+app.MapGet("/pedido/totalizadorporpedido/{codigoPedido}", async (int codigoPedido, IRelatorioRepository relatorioRepository) =>
 {
 	try
 	{
@@ -27,7 +31,9 @@ app.MapGet("/pedido/soma/{codigoPedido}", async (int codigoPedido, IRelatorioRep
 			return Results.NotFound();
 		}
 
-		return Results.Ok(new { codigoPedido, somaPrecos });
+		var valorFormatado = somaPrecos.ToString("F");
+
+        return Results.Ok(new { codigoPedido, valorFormatado});
 	}
 	catch (Exception ex)
 	{
@@ -35,7 +41,7 @@ app.MapGet("/pedido/soma/{codigoPedido}", async (int codigoPedido, IRelatorioRep
     }
 });
 
-app.MapGet("/pedido/", async(IRelatorioRepository relatorioRepository) => 
+app.MapGet("/pedido/relatoriopedidoporcliente", async(IRelatorioRepository relatorioRepository) => 
 {
 	try
 	{
@@ -43,8 +49,8 @@ app.MapGet("/pedido/", async(IRelatorioRepository relatorioRepository) =>
 		if (pedidosPorCliente == null)
 		{
 			return Results.NotFound();
-		}
-		return Results.Ok(pedidosPorCliente);
+		}		
+        return Results.Ok(pedidosPorCliente);
 	}
 	catch (Exception ex)
 	{
@@ -52,11 +58,11 @@ app.MapGet("/pedido/", async(IRelatorioRepository relatorioRepository) =>
 	}
 });
 
-app.MapGet("/pedido/{codigoCliente}", async (int codigoCliente, IRelatorioRepository relatorioRepository) => 
+app.MapGet("/pedido/listapedidosporcliente/{codigoCliente}", async (int codigoCliente, IRelatorioRepository relatorioRepository) => 
 {
 	try
 	{
-		var listaPedidos = relatorioRepository.ObterListaDePedidosPorCliente(codigoCliente);
+		var listaPedidos = await relatorioRepository.ObterListaDePedidosPorCliente(codigoCliente);
 		return Results.Ok(listaPedidos);
 	}
 	catch (Exception ex)

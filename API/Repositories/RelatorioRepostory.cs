@@ -14,12 +14,14 @@ namespace API.Repositories
 
         public async Task<List<Pedido>> ObterListaDePedidosPorCliente(int codigoCliente)
         {
-            return await _mongoService.ObterListaDePedidosPorCliente(codigoCliente);
+            var result = await _mongoService.ObterListaDePedidosPorCliente(codigoCliente);
+            return result;
         }
 
         public async Task<List<PedidoPorClienteDTO>> ObterQuantidadePedidoPorCliente()
         {
-            return await _mongoService.ObterQuantidadePedidoPorCliente();            
+            var result = await _mongoService.ObterQuantidadePedidoPorCliente();
+            return result;
         }
 
         public async Task<double> ObterSomaPrecosAsync(int codigoPedido)

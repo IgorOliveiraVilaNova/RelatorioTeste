@@ -20,7 +20,24 @@ services:
     build: 
       context: ./ConsumerPedidos
       dockerfile: Dockerfile
-    container_name: rabbitmq_worker
+    container_name: worker_leitura_registros
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+      - mongodb
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - MONGODB_HOST=mongodb
+      - MONGODB_PORT=27017
+  
+  api:
+    build: 
+      context: ./API
+      dockerfile: Dockerfile
+    container_name: api_relatorios
+    ports:
+      - "8080:8080"
     restart: on-failure
     depends_on:
       - rabbitmq
